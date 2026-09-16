@@ -1,0 +1,18 @@
+{
+  "source": "Cricsheet",
+  "source_url": "https://cricsheet.org/downloads/",
+  "archive_url": "https://cricsheet.org/downloads/ipl_json.zip",
+  "downloaded_on": "2026-09-16",
+  "archive_sha256": "841b98290a08bdf2a063a9f4d6342fb2363ff246491ed3db4c571bddb6ea2a79",
+  "matches": 1234,
+  "excluded_no_decisive_winner": 9,
+  "first_date": "2008-04-18",
+  "last_date": "2026-05-31",
+  "aliases": {
+    "Delhi Daredevils": "Delhi Capitals",
+    "Kings XI Punjab": "Punjab Kings",
+    "Royal Challengers Bangalore": "Royal Challengers Bengaluru",
+    "Rising Pune Supergiants": "Rising Pune Supergiant"
+  },
+  "transformations": "Match metadata only; franchise renames normalized. No-result games excluded. Super-over winners included when recorded."
+}

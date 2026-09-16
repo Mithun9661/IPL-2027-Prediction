@@ -1,0 +1,17 @@
+{
+  "model": "Regularized logistic regression with signed team, toss, batting-order and venue features",
+  "train_matches": 1161,
+  "test_matches": 73,
+  "test_season": 2026,
+  "accuracy": 0.4246575342465753,
+  "historical_win_rate_baseline_accuracy": 0.4520547945205479,
+  "brier_score": 0.25625956980024156,
+  "log_loss": 0.7057150179350009,
+  "final_training_matches": 1234,
+  "first_date": "2008-04-18",
+  "data_through": "2026-05-31",
+  "sklearn_version": "1.7.1",
+  "data_sha256": "e794d2978d99a8bc571d94a9fce2eff15b975391664b5b8b42da8c5b32ecee11",
+  "protocol": "Last season held out, no parameter tuning on holdout; final serving model refit on all matches. Five-year half-life sample weights.",
+  "limitations": "Historical baseline only; no player lineups, injuries, weather, live scores or 2027 results. Probabilities are not independently calibrated. Match winner conditional on a decisive result, not tournament champion."
+}
