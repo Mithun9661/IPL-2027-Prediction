@@ -5,12 +5,8 @@ from predictor import load_bundle, predict
 
 ROOT = Path(__file__).parent
 st.set_page_config(page_title='IPL 2027 | Match Lab', page_icon='🏏', layout='wide')
-st.markdown('''<style>
-.stApp {background: #0b1220; color: #eef2ff;}
-.block-container {max-width: 1100px; padding-top: 2rem;}
-[data-testid="stMetric"] {background: #152238; padding: 18px; border-radius: 14px;}
-.stButton > button {background: #b7ee61; color: #132016; font-weight: 700; border: 0;}
-</style>''', unsafe_allow_html=True)
+from ui import matchup, probability, pills
+st.markdown((ROOT / 'theme.css').read_text(), unsafe_allow_html=True)
 
 @st.cache_resource
 def resources():
@@ -18,11 +14,8 @@ def resources():
 
 bundle, matches = resources()
 report = bundle['report']
-st.caption('MATCH LAB  /  IPL 2027')
-st.title('Every matchup starts with a question.')
-st.write('Explore match outcomes using historical team, venue and toss data.')
-st.warning(f"Experimental model · {report['test_season']} retrospective accuracy: {report['accuracy']:.1%}. "
-           'Accuracy remains close to chance. Treat its estimates as exploratory, not a reliable 2027 forecast.')
+st.markdown('<div class="masthead"><div class="brand">MATCH<span>LAB</span> / CRICKET</div><div class="season">IPL 2027 · MATCH EXPLORER</div></div><div class="hero"><div class="field" aria-hidden="true"></div><div class="eyebrow">THE MATCHUP. THE HISTORY. THE EDGE.</div><h1>Know the contest.<br>Explore the possibilities.</h1><p>Compare team form, revisit the rivalry and explore a data-driven match estimate.</p></div>', unsafe_allow_html=True)
+st.caption(f"Experimental model · {report['test_season']} retrospective accuracy {report['accuracy']:.1%}, close to chance. Not a reliable 2027 forecast. No live scores or confirmed fixtures.")
 a, b, c = st.columns(3)
 a.metric('Historical matches', f"{len(matches):,}")
 b.metric('Data through', report['data_through'])
@@ -30,16 +23,20 @@ c.metric('Teams available', len(bundle['active_teams']))
 
 prediction_tab, history_tab, model_tab = st.tabs(['Match prediction', 'Head-to-head', 'Model & data'])
 with prediction_tab:
-    st.subheader('Set up your match')
+    st.markdown('<div class="sectionlabel">01 / CHOOSE YOUR MATCHUP</div>', unsafe_allow_html=True)
     left, right = st.columns(2)
     team1 = left.selectbox('Team 1', bundle['active_teams'], key='team1')
     options = [t for t in bundle['active_teams'] if t != team1]
     team2 = right.selectbox('Team 2', options, key='team2')
+    st.markdown(matchup(team1, team2, bundle['history']), unsafe_allow_html=True)
+    st.caption(f"Form and ratings through {report['data_through']} · Abbreviation badges, not official team logos.")
+    st.markdown('<div class="sectionlabel">02 / MATCH CONDITIONS</div>', unsafe_allow_html=True)
     venues = bundle['venues']
     venue = st.selectbox('Venue', venues, key='venue')
     l, r = st.columns(2)
     toss_winner = l.selectbox('Toss winner', [team1, team2], key='toss_winner')
     decision = r.selectbox('Toss decision', ['bat', 'field'], key='decision')
+    st.markdown(pills(venue, toss_winner, decision), unsafe_allow_html=True)
     inputs = (team1, team2, venue, toss_winner, decision)
     if st.button('Estimate match outcome', type='primary', key='predict'):
         st.session_state['prediction'] = (inputs, predict(bundle, *inputs))
@@ -48,10 +45,7 @@ with prediction_tab:
         probabilities = result[1]
         winner = max(probabilities, key=probabilities.get)
         st.subheader(f'Model leans toward {winner}')
-        one, two = st.columns(2)
-        one.metric(team1, f'{probabilities[team1]:.1%}')
-        two.metric(team2, f'{probabilities[team2]:.1%}')
-        st.progress(probabilities[team1], text=f'{team1} share of the two-team estimate')
+        st.markdown(probability(team1, team2, probabilities[team1]), unsafe_allow_html=True)
         st.caption('Estimated probability conditional on a decisive result. These probabilities have not been independently calibrated.')
         venue_count = int((matches.venue == venue).sum())
         st.caption(f'{venue_count} historical matches at this recorded venue. Venue names follow the source and may contain naming variants.')
@@ -59,6 +53,8 @@ with prediction_tab:
             st.info('Limited history at this venue: its venue effect is based on fewer than 20 matches.')
     elif result:
         st.info('Selections changed. Click Estimate match outcome for an updated result.')
+    else:
+        st.markdown('<div class="empty">Your matchup is ready. Choose the conditions above, then estimate the outcome.</div>', unsafe_allow_html=True)
     with st.expander('Team form and strength at data cutoff'):
         state = bundle['history']
         st.caption(f"Historical snapshot through {report['data_through']}; not live form.")
