@@ -25,6 +25,8 @@ def predict(bundle, team1, team2, venue, toss_winner, toss_decision):
         raise ValueError('Selected team is not supported by the trained model.')
     if venue not in bundle['venues']:
         raise ValueError('Select a venue from the historical data.')
-    row = features(team1, team2, venue, toss_winner, toss_decision)
-    p = float(bundle['pipeline'].predict_proba([row])[0, 1])
+    from history import History
+    from train import probabilities
+    row = History.restore(bundle['history']).row(team1, team2, venue, toss_winner, toss_decision)
+    p = float(probabilities(bundle['pipeline'], [row], bundle['model_name'])[0])
     return {team1: p, team2: 1.0 - p}
